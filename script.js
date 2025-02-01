@@ -38,8 +38,9 @@ const Gameboard = (function(){
     
     //Cell object
     function cell(){
-        let value = 0;
+        let value = 0;// 0 = empty, 1 = Player One, 2 = Player Two
         // Accept a player's token to change the value of the cell
+        
         const addToken = (player) => {
             value = player;
         };
@@ -62,6 +63,7 @@ const Gameboard = (function(){
                 return false;
             }
             chosenCell.addToken(player);
+            updateCellUI(rowIndex, colIndex, player);
             return true;
             
     }
@@ -72,6 +74,12 @@ const Gameboard = (function(){
         const boardWithCellValues = board.map((row) => row.map((cell) => cell.getValue()))
         console.log(boardWithCellValues);
       };
+
+    const updateCellUI = (row, col, player) =>{
+        const cellElement = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+        cellElement.setAttribute("data-token", player); //sets the data token attruibute
+        cellElement.textContent = player === 1 ? "X" : "O" //if player value is = 1 return X
+    };
     
     //exposes the only public method for accessing the gameboard
     //It checks whether the instance is already created, it not
@@ -134,20 +142,27 @@ const GameController = function(playerOneName = 'Player One', playerTwoName = 'P
         printNewRound();
     };
     
+   const setupGame = () =>{
+    document.querySelectorAll('.cell').forEach(cell =>{
+        cell.addEventListener('click',()=>{
+            const row = parseInt(cell.getAttribute('data-row'));
+            const col = parseInt(cell.getAttribute('data-col'));
+            playRound(row,col);
+        });
+    });
+
     printNewRound();
-    playRound(2,2);
-    playRound(1,1);
-    playRound(1,2);
-    playRound(2,2);
+   };
 
     return{
-        playRound,
+        setupGame,
         getActivePlayer
     };
 
 }
 
 const game = new GameController('Alice', 'Bob');
+game.setupGame();
 
 //const board = Gameboard.getBoard();
 
