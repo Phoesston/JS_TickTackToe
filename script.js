@@ -134,12 +134,58 @@ const GameController = function(playerOneName = 'Player One', playerTwoName = 'P
         const moveSuccessful = board.makeMove(rowIndex, colIndex, getActivePlayer().token);
 
         if(moveSuccessful){
+            const result = checkWin();
+            
+            if(result === 1 || result ===2){
+                console.log(`Player ${result ===1 ? players[0].name : players[1].name} wins!`)
+                return;
+            }else if(result === 'draw' ){
+                console.log("Draw!!");
+                return;
+            }
+
             switchPlayerTurn();
         }else{
             console.log('Try again!!!')
         }
 
         printNewRound();
+    };
+
+    const checkWin = () => {
+        const board = Gameboard.getBoard().getBoard();
+        const winningConditions = [
+            //rows
+            [board[0][0],board[0][1],board[0][2]],
+            [board[1][0],board[1][1],board[1][2]],
+            [board[2][0],board[2][1],board[2][2]],
+            //columns
+            [board[0][0],board[1][0],board[2][0]],
+            [board[0][1],board[1][1],board[2][1]],
+            [board[0][2],board[1][2],board[2][2]],
+            //diagonals
+            [board[0][0],board[1][1],board[2][2]],
+            [board[2][0],board[1][1],board[0][2]],
+        ];
+
+        for (let condition of winningConditions){
+            
+            if(condition[0].getValue() !==0 && 
+            condition[0].getValue() === condition[1].getValue() && 
+            condition[1].getValue() === condition[2].getValue()){
+                return condition[0].getValue();
+            }
+
+        }
+
+        if(board.flat().every(cell => cell.getValue() !==0)){
+            return "draw"; //convert the 2d array into a 1d array
+                            //then checks if every cell has a token
+                            //if every cell has a player token return draw
+
+        }
+
+        return null; // if theres no verdict
     };
     
    const setupGame = () =>{
@@ -148,6 +194,7 @@ const GameController = function(playerOneName = 'Player One', playerTwoName = 'P
             const row = parseInt(cell.getAttribute('data-row'));
             const col = parseInt(cell.getAttribute('data-col'));
             playRound(row,col);
+   
         });
     });
 
