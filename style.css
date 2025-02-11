@@ -1,11 +1,18 @@
 body{
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh; /*100% viewport height */
-    margin: 0;
     font-family: Arial, Helvetica, sans-serif;
-    background-color: #f0f0f0;
+    background-color: #ADD8E6;
+}
+
+.status {
+    margin-top: 20px;
+    font-size: 1.5em;
+    text-align: center;
+
 }
 
 .gameboard{
@@ -13,6 +20,7 @@ body{
     grid-template-rows: repeat(3,100px);
     grid-template-columns: repeat(3,100px);
     gap: 5px;
+    margin-bottom: 20px;
 }
 
 .row{
@@ -20,8 +28,8 @@ body{
 }
 
 .cell{
-    background-color: #fff;
-    border: 2px solid #000;
+    background-color: #4f69e0;
+    border: 2px solid #505bca;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -31,15 +39,34 @@ body{
 }
 
 .cell[data-token="1"] { /* data-token attribute will be added with javascript */
-    color: #ff0000; /* Red for Player One */
+    color: #e976bd; /* Red for Player One */
 }
 
 .cell[data-token="2"] {
-    color: #0000ff; /* Blue for Player Two */
+    color: #f0f0f0; /* Blue for Player Two */
 }
 
-.status {
-    margin-top: 20px;
-    font-size: 1.5em;
-    text-align: center;
+.buttons button {
+    background-color: white; 
+    border: none;
+    padding: 20px 30px;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #4f69e0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+}
+
+.buttons button:hover {
+    background-color: #e976bd; /* Darker red on hover */
+    transform: translateY(-2px); /* Slight lift effect */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* Enhance shadow on hover */
+}
+
+.buttons button:active {
+    background-color: #e976bd; /* Even darker red when clicked */
+    transform: translateY(0); /* Reset lift effect */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Reset shadow */
 }

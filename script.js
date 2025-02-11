@@ -4,6 +4,7 @@ const Gameboard = (function(){
     //It's result is stored in the "instance" variable
     let instance;
     let board =[];
+    let gameOver = false;
 
     function createInstance(){
          //singleton Class of the tick-tack-toe board
@@ -22,6 +23,8 @@ const Gameboard = (function(){
                 }
             }   
         }
+
+      
         
         createBoard();
         //exposes to the API
@@ -29,7 +32,13 @@ const Gameboard = (function(){
             createBoard, 
             getBoard:()=>board,
             printBoard,
-            makeMove
+            makeMove,
+            isGameOver: () =>gameOver,
+            setGameOver: (status) => { gameOver = status; }
+       
+
+            
+
             
         };
                 
@@ -56,6 +65,8 @@ const Gameboard = (function(){
 
     const makeMove = (rowIndex, colIndex,player)=>{
         //Bug: Seems like the if statement is always called
+        if (gameOver) return false;
+
         let chosenCell = board[rowIndex][colIndex];
 
             if (chosenCell.getValue() != 0) {
@@ -75,11 +86,17 @@ const Gameboard = (function(){
         console.log(boardWithCellValues);
       };
 
+
+    
     const updateCellUI = (row, col, player) =>{
+        if(gameOver) return;
+
         const cellElement = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
         cellElement.setAttribute("data-token", player); //sets the data token attruibute
         cellElement.textContent = player === 1 ? "X" : "O" //if player value is = 1 return X
     };
+
+
     
     //exposes the only public method for accessing the gameboard
     //It checks whether the instance is already created, it not
@@ -126,30 +143,49 @@ const GameController = function(playerOneName = 'Player One', playerTwoName = 'P
     const printNewRound = () => {
         board.printBoard();
         console.log(`${getActivePlayer().name}'s turn.`);
+        updateStatus(`${getActivePlayer().name}'s turn`);
+    };
+
+    const resultScreen = (rowIndex, colIndex) => {
+        
     };
 
     const playRound = (rowIndex,colIndex) =>{
+        if (board.isGameOver()) return; 
+
         console.log(`${getActivePlayer().name}'s choice`);
         
         const moveSuccessful = board.makeMove(rowIndex, colIndex, getActivePlayer().token);
+
+        
 
         if(moveSuccessful){
             const result = checkWin();
             
             if(result === 1 || result ===2){
                 console.log(`Player ${result ===1 ? players[0].name : players[1].name} wins!`)
+                updateStatus(`${getActivePlayer().name} WINS!!`);
+                board.setGameOver(true);
                 return;
             }else if(result === 'draw' ){
                 console.log("Draw!!");
+                updateStatus(`DRAW`);
+                board.setGameOver(true);
                 return;
             }
 
             switchPlayerTurn();
         }else{
             console.log('Try again!!!')
+            updateStatus(`Invalid try Again`);
         }
 
-        printNewRound();
+         // Ensure no result exists before proceeding to next round
+        if (!board.isGameOver()) {
+            printNewRound();
+        }
+
+
     };
 
     const checkWin = () => {
@@ -187,6 +223,13 @@ const GameController = function(playerOneName = 'Player One', playerTwoName = 'P
 
         return null; // if theres no verdict
     };
+
+   
+
+
+    const updateStatus = (message) => {
+        document.querySelector('.status').innerHTML = `<h1>${message}</h1>`;
+    }
     
    const setupGame = () =>{
     document.querySelectorAll('.cell').forEach(cell =>{
@@ -199,16 +242,37 @@ const GameController = function(playerOneName = 'Player One', playerTwoName = 'P
     });
 
     printNewRound();
+
    };
+
+   // Reset button functionality
+   //bug: it doesnt reset right sometimes
+   document.getElementById('reset').addEventListener('click', () => {
+        board.getBoard();
+        board.createBoard(); // Reset the gameboard
+
+        board.setGameOver(false);
+
+        document.querySelectorAll('.cell').forEach((cell) => {
+            cell.textContent = '';
+            cell.removeAttribute('data-token'); 
+        });
+        updateStatus(`${getActivePlayer().name}'s turn`); 
+
+        activePlayer = players[0]
+
+        setupGame();
+        console.log(board.getBoard())
+    });
 
     return{
         setupGame,
-        getActivePlayer
+        getActivePlayer,
     };
 
 }
 
-const game = new GameController('Alice', 'Bob');
+const game = new GameController('Player 1', 'Player 2');
 game.setupGame();
 
 //const board = Gameboard.getBoard();
